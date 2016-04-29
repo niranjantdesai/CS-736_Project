@@ -22,13 +22,11 @@ mIyIy = sum(mIy.*mIy,3);
 % tensor; also vectorizing spatial coordinates
 tensorSmoothingSigma = 1.1;
 smoothMIxIx = reshape(imgaussfilt(mIxIx,tensorSmoothingSigma),N,1);
-smoothMIxIy = reshape(imgaussfilt(mIxIy,tensorSmoothingSigma),[],1);
-smoothMIyIy = reshape(imgaussfilt(mIyIy,tensorSmoothingSigma),[],1);
+smoothMIxIy = reshape(imgaussfilt(mIxIy,tensorSmoothingSigma),N,1);
+smoothMIyIy = reshape(imgaussfilt(mIyIy,tensorSmoothingSigma),N,1);
 
 
 % Calc smoothing geometry tensor field
-sqrtT = zeros(N,4);
-
 
 % Calculating eigenvalues (adapted from Eig3 files)
 P3 = 1;
@@ -43,7 +41,7 @@ v1_1 = sqrt(1+((eigenvals(:,1) - smoothMIxIx)./smoothMIxIy).^2).^-1;
 v1_2 = ((eigenvals(:,1) - smoothMIxIx)./smoothMIxIy).*v1_1;
 
 v2_1 = sqrt(1+((eigenvals(:,2) - smoothMIxIx)./smoothMIxIy).^2).^-1;
-v2_2 = ((eigenvals(:,2) - smoothMIxIx)./smoothMIxIy).*v1_1;
+v2_2 = ((eigenvals(:,2) - smoothMIxIx)./smoothMIxIy).*v2_1;
 
 coeff1 = (1+eigenvals(:,1)+eigenvals(:,2)).^-(p2/2);
 coeff2 = (1+eigenvals(:,1)+eigenvals(:,2)).^-(p1/2);
