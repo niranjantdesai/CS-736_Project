@@ -2,8 +2,8 @@ function outImg = SmoothImage(inpImg)
 
 %% Get smooth structure tensor field
 
-p1 = 0.001;
-p2 = 100;
+p1 = 0.5;
+p2 = 0.9;
 sqrtT = GetStructureTensorField(inpImg,p1,p2);
 N = size(sqrtT,1);
 
@@ -28,7 +28,7 @@ for i=1:M
     scalingFactor = stepSize./norms;
     w = w.*repmat(scalingFactor,1,2);
     
-    mFsigma  = norms*5;
+    mFsigma  = norms*16;
 	mLength = gaussianKernelPrecision * mFsigma;
     
     w = reshape(w,size(inpImg,1),size(inpImg,2),2);
