@@ -36,15 +36,24 @@ mOutputImage = zeros( size(mInputImage) );
 			counter = 0;
 			X       = x;
 			Y       = y;
+            cx = -1;
+            cy = -1;
 			while l <= mLength(y,x)
             
-				cx = round(X);
-				cy = round(Y);
+				cxNew = round(X);
+				cyNew = round(Y);
+                
+                if cxNew==cx && cyNew==cy
+                    break
+                end
+                cx = cxNew;
+                cy = cyNew;
 				if (cx > size(tW, 2) || cy > size(tW, 1) || cx <= 0 || cy <= 0)
 					break;
                 end
 				
                 val = val + mInputImage(cy, cx, :);
+                
 
                 X = X + tW(cy, cx, 1);
                 Y = Y + tW(cy, cx, 2);

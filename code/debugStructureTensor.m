@@ -1,5 +1,10 @@
-function sqrtT = GetStructureTensorField(img,p1,p2)
+%img = imresize(imread('../data/lena512.png'),0.25);
 
+img = zeros(100,100);
+img(40:60,40:60) = 1;
+
+p1 = 0.001;
+p2 = 100;
 
 numChannels = size(img,3);
 N = size(img,1)*size(img,2);
@@ -25,8 +30,6 @@ smoothMIxIx = reshape(imgaussfilt(mIxIx,tensorSmoothingSigma),N,1);
 smoothMIxIy = reshape(imgaussfilt(mIxIy,tensorSmoothingSigma),N,1);
 smoothMIyIy = reshape(imgaussfilt(mIyIy,tensorSmoothingSigma),N,1);
 
-
-% Calc smoothing geometry tensor field
 Tau = ( smoothMIyIy - smoothMIxIx ) ./ ( 2 * smoothMIxIy );
 t   = sign(Tau) ./ ( abs(Tau) + sqrt( 1 + (Tau .* Tau) ) );
 c   = 1 ./ sqrt( 1 + (t .* t) );
@@ -47,10 +50,34 @@ eigenval2 = mMinLambdaMask .* valB + (1 - mMinLambdaMask) .* valA;
 v1 = tMinLambdaMask .* vecA + (1 - tMinLambdaMask) .* vecB;
 v2 = tMinLambdaMask .* vecB + (1 - tMinLambdaMask) .* vecA;
 
-coeff1 = (1+eigenval1+eigenval2).^-(p2/2);
-coeff2 = (1+eigenval1+eigenval2).^-(p1/2);
 
-sqrtT = [coeff1.*(v1(:,1).^2), coeff1.*v1(:,1).*v1(:,2), coeff1.*(v1(:,2).^2)] + ...
-    [coeff2.*(v2(:,1).^2), coeff2.*v2(:,1).*v2(:,2), coeff2.*(v2(:,2).^2)];
+% Calc smoothing geometry tensor field
 
-end
+
+w1_x = reshape(v1(:,1),size(img,1),size(img,2));
+w1_y = reshape(v1(:,2),size(img,1),size(img,2));
+
+w2_x = reshape(v2(:,1),size(img,1),size(img,2));
+w2_y = reshape(v2(:,1),size(img,1),size(img,2));
+
+val_1 = reshape(eigenval1,size(img,1),size(img,2));
+val_2 = reshape(eigenval2,size(img,1),size(img,2));
+
+figure(1)
+imshow(img)
+
+figure(2)
+quiver(w1_x,w1_y);
+
+figure(3)
+quiver(w2_x,w2_y);
+
+figure(4);
+imagesc(val_1);
+colorbar;
+
+figure(5);
+imagesc(val_2);
+colorbar;
+
+

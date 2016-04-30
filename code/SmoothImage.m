@@ -1,9 +1,9 @@
-function outImg = SmoothImage(inpImg)
+function outImg = SmoothImage(inpImg, specMap)
 
 %% Get smooth structure tensor field
 
-p1 = 0.5;
-p2 = 0.9;
+p1 = 0.001;
+p2 = 100;
 sqrtT = GetStructureTensorField(inpImg,p1,p2);
 N = size(sqrtT,1);
 
@@ -24,19 +24,23 @@ for i=1:M
     a = [cos(angle) 0; sin(angle) cos(angle); 0 sin(angle)];
     w = sqrtT*a;
     
-    norms = sqrt(w(:,1).^2 + w(:,2).^2);
-    scalingFactor = stepSize./norms;
-    w = w.*repmat(scalingFactor,1,2);
+%     norms = sqrt(w(:,1).^2 + w(:,2).^2);
+%     scalingFactor = stepSize./norms;
+%     w = w.*repmat(scalingFactor,1,2);
     
-    mFsigma  = norms*16;
-	mLength = gaussianKernelPrecision * mFsigma;
+%     %mFsigma  = norms*16;
+%     mFsigma  = norms*50;
+% 	mLength = gaussianKernelPrecision * mFsigma;
     
     w = reshape(w,size(inpImg,1),size(inpImg,2),2);
-    mLength = reshape(mLength,size(inpImg,1),size(inpImg,2),1);
+%    mLength = reshape(mLength,size(inpImg,1),size(inpImg,2),1);
     
-    outImg = outImg + ApplyImageLineIntegralConvolution(inpImg, w, mLength, stepSize);
+    op = SpeckleLineIntegral(inpImg, w, stepSize);
+    
+    outImg = outImg + op;
     
 end
 
 outImg = outImg/M;
+outImg(~specMap) = inpImg(~specMap);
     
