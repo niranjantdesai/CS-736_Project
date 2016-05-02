@@ -10,7 +10,7 @@ function [matchingPatchIndices,matchingDist] = FindMatches( patch, samplePatches
 mask = mask(:);
 totalWeight = sum(sum(mask));
 % mask for color images
-% mask = repmat(mask,3,1);
+mask = repmat(mask,3,1);
 
 
 

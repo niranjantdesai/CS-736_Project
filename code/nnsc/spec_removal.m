@@ -8,31 +8,24 @@ patchSize = 8;
 
 %% Load data
 % Load the saved dictionary
-load('../../data/fret/dictionary/dict.mat');
+load('../../data/nnsc/dictionary/dict.mat');
 
 % load the input image
-xTrue = im2double(imresize(imread('../../data/fret/raw_images/YRC_PIR_IMAGEID_13.ome.tif'),0.25));
+xTrue = im2double(imresize(imread('../../data/nnsc/raw_images/test7.jpg'),0.25));
 
 N = size(xTrue,1)*size(xTrue,2);
 
 %% Generating specularities
 
 [y, specMap] = AddSpeckles(xTrue);
-
-%% Initializing using mean value of the image
-meanVal = mean(mean(xTrue));
-
-xInit = y;
-xInit(specMap) = meanVal;
-
 mask = ~specMap;
 
 %% Initialize solution
-xEfros = EfrosInpainting(y,specMap);
+% xEfros = EfrosInpainting(y,specMap);
 
 %% Iterate
 
-x = xEfros;
+x = y;
 
 threshold = 1e-5;
 maxIters = 20;
@@ -49,8 +42,10 @@ param.lambda = lambda;
 temp=zeros(size(xTrue));
 
 % Step size for gradient descent
-stepSize = 0.05;
-alpha = 0.15/(patchSize^2);
+stepSize = 0.5;
+alpha_ = 0.8;
+alpha = alpha_/(patchSize^2);
+
 
 
 xPatches = mexExtractPatches(x,patchSize,1);
@@ -71,8 +66,8 @@ while(1)
     
     % Minimizing w.r.t to c
     xDict = mexCombinePatches(U*c,temp,patchSize,1,1,1);
-    grad = alpha*(x-xDict)+(1-alpha)*(x-y).*(mask);
-    % grad(specMap) = x(specMap)-xDict(specMap);
+    grad = alpha_*(x-xDict)+(1-alpha_)*(x-y).*(mask);
+    grad(specMap) = x(specMap)-xDict(specMap);
     
     % Minimizing w.r.t to x
     xNew = x - stepSize*grad;
@@ -120,9 +115,9 @@ token = num2str(now);
 figure(1);
 plot(costArray(1:iter));
 title('cost');
-saveas(1,strcat('../../data/fret/spec_removal/',token,'-cost.png'),'png');
+saveas(1,strcat('../../data/nnsc/spec_removal/',token,'-cost.png'),'png');
 
-imwrite(xTrue,strcat('../../data/fret/spec_removal/',token,'-x.png'));
-imwrite(y,strcat('../../data/fret/spec_removal/',token,'-y.png'));
-imwrite(z,strcat('../../data/fret/spec_removal/',token,'-z.png'));
+imwrite(xTrue,strcat('../../data/nnsc/spec_removal/',token,'-x.png'));
+imwrite(y,strcat('../../data/nnsc/spec_removal/',token,'-y.png'));
+imwrite(z,strcat('../../data/nnsc/spec_removal/',token,'-z.png'));
 

@@ -41,16 +41,19 @@ valB = smoothMIyIy + ( t .*smoothMIxIy );
 mMinLambdaMask = valA < valB;
 tMinLambdaMask = cat(3, mMinLambdaMask, mMinLambdaMask);
 
+% eigenval2 is the bigger eigenvalue
 eigenval1 = mMinLambdaMask .* valA + (1 - mMinLambdaMask) .* valB;
 eigenval2 = mMinLambdaMask .* valB + (1 - mMinLambdaMask) .* valA;
 
 v1 = tMinLambdaMask .* vecA + (1 - tMinLambdaMask) .* vecB;
 v2 = tMinLambdaMask .* vecB + (1 - tMinLambdaMask) .* vecA;
 
-coeff1 = (1+eigenval1+eigenval2).^-(p2/2);
-coeff2 = (1+eigenval1+eigenval2).^-(p1/2);
+coeff1 = (1+eigenval1+eigenval2).^-(p1/2);
+coeff2 = (1+eigenval1+eigenval2).^-(p2/2);
 
 sqrtT = [coeff1.*(v1(:,1).^2), coeff1.*v1(:,1).*v1(:,2), coeff1.*(v1(:,2).^2)] + ...
     [coeff2.*(v2(:,1).^2), coeff2.*v2(:,1).*v2(:,2), coeff2.*(v2(:,2).^2)];
+
+sqrtT(isnan(sqrtT)) = 1;
 
 end

@@ -25,8 +25,8 @@ border_mask = negMask - imerode(negMask,se); %obtain dilation and subtract to ob
 PixelList = [rows, cols];
 
 % ** Defining params**
-errThreshold = 0.1; %constant given by pseudo code
-maxErrThreshold = 0.3; %constant given by pseudo code
+errThreshold = 0.4; %constant given by pseudo code
+maxErrThreshold = 0.5; %constant given by pseudo code
 windowSize = 13;
 sigma = (windowSize*2 + 1)/6.4; %compute sigma...based on formula in pseudo code
 
@@ -43,11 +43,13 @@ tempPatches = mexExtractPatches(outImg,2*windowSize+1,1);
 % select only patches not having the specularity
 maskPatches = mexExtractPatches(double(negMask),2*windowSize+1,1);
 
-xPatches = tempPatches(:,sum(maskPatches)==0);
+xPatches = tempPatches(:,sum(maskPatches)>0);
 
 
 while ~isempty(PixelList) %while hole is not filled
     disp('itering');
+    
+    disp(size(PixelList,1));
 
     progress = 0;
     % loop for unfilled pixels
@@ -80,8 +82,7 @@ while ~isempty(PixelList) %while hole is not filled
         
         % picking best match randomly
         bestMatchIdx = unidrnd(length(patchIdx));
-%         bestMatchPatch = reshape(xPatches(:,patchIdx(bestMatchIdx)),2*windowSize+1,2*windowSize+1,3);
-        bestMatchPatch = reshape(xPatches(:,patchIdx(bestMatchIdx)),2*windowSize+1,2*windowSize+1);
+        bestMatchPatch = reshape(xPatches(:,patchIdx(bestMatchIdx)),2*windowSize+1,2*windowSize+1,3);
         
         if errors(bestMatchIdx) < maxErrThreshold
             outImg(x,y,:) = bestMatchPatch(windowSize+1,windowSize+1,:);
